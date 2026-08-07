@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Electricidad Industrial - Grado 8vo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+        }
+        h2 {
+            color: #2980b9;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-top: 30px;
+        }
+        .question-block {
+            margin-bottom: 20px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .options {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .options li {
+            margin-bottom: 8px;
+        }
+        label {
+            cursor: pointer;
+        }
+        .tf-options {
+            display: flex;
+            gap: 20px;
+        }
+        .matching-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+        select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #27ae60;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+        button:hover {
+            background-color: #2ecc71;
+        }
+        @media print {
+            body { background-color: white; }
+            .container { box-shadow: none; padding: 0; }
+            button { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Evaluación de Electricidad Industrial</h1>
+    
+    <div class="header-info">
+        <div><strong>Grado:</strong> Octavo (8vo)</div>
+        <div><strong>Nombre:</strong> ___________________________</div>
+        <div><strong>Fecha:</strong> ______________</div>
+    </div>
+
+    <p><em>Instrucciones: Lee atentamente cada pregunta y selecciona la respuesta correcta. Esta evaluación consta de 10 preguntas divididas en tres secciones.</em></p>
+
+    <form onsubmit="event.preventDefault(); alert('Evaluación completada. ¡Buen trabajo!');">
+        
+        <!-- SECCIÓN 1: SELECCIÓN MÚLTIPLE -->
+        <h2>I. Selección Múltiple</h2>
+        
+        <div class="question-block">
+            <div class="question-text">1. ¿Qué es la corriente eléctrica?</div>
+            <ul class="options">
+                <li><label><input type="radio" name="q1" value="a"> a) Una fuerza estática en los imanes.</label></li>
+                <li><label><input type="radio" name="q1" value="b"> b) El flujo de electrones a través de un material conductor.</label></li>
+                <li><label><input type="radio" name="q1" value="c"> c) La oposición al paso de la energía.</label></li>
+            </ul>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">2. ¿Cuál es la unidad de medida de la resistencia eléctrica según el Sistema Internacional?</div>
+            <ul class="options">
+                <li><label><input type="radio" name="q2" value="a"> a) Voltio (V)</label></li>
+                <li><label><input type="radio" name="q2" value="b"> b) Amperio (A)</label></li>
+                <li><label><input type="radio" name="q2" value="c"> c) Ohmio (Ω)</label></li>
+            </ul>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">3. ¿Qué instrumento se utiliza para medir la diferencia de potencial o voltaje?</div>
+            <ul class="options">
+                <li><label><input type="radio" name="q3" value="a"> a) Amperímetro</label></li>
+                <li><label><input type="radio" name="q3" value="b"> b) Voltímetro</label></li>
+                <li><label><input type="radio" name="q3" value="c"> c) Watímetro</label></li>
+            </ul>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">4. Un circuito en el que la corriente tiene un solo camino para fluir desde la fuente hasta el receptor y de regreso se llama:</div>
+            <ul class="options">
+                <li><label><input type="radio" name="q4" value="a"> a) Circuito en paralelo</label></li>
+                <li><label><input type="radio" name="q4" value="b"> b) Circuito en serie</label></li>
+                <li><label><input type="radio" name="q4" value="c"> c) Circuito abierto</label></li>
+            </ul>
+        </div>
+
+        <!-- SECCIÓN 2: FALSO Y VERDADERO -->
+        <h2>II. Falso o Verdadero</h2>
+        
+        <div class="question-block">
+            <div class="question-text">5. Un material aislante, como el plástico o la madera, permite el paso de la corriente eléctrica con mucha facilidad.</div>
+            <div class="tf-options">
+                <label><input type="radio" name="q5" value="v"> Verdadero</label>
+                <label><input type="radio" name="q5" value="f"> Falso</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">6. La Ley de Ohm establece la relación matemática entre el voltaje, la corriente y la resistencia en un circuito.</div>
+            <div class="tf-options">
+                <label><input type="radio" name="q6" value="v"> Verdadero</label>
+                <label><input type="radio" name="q6" value="f"> Falso</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-text">7. En un circuito en paralelo, si una bombilla se funde (se quema), todas las demás bombillas del circuito se apagan inmediatamente.</div>
+            <div class="tf-options">
+                <label><input type="radio" name="q7" value="v"> Verdadero</label>
+                <label><input type="radio" name="q7" value="f"> Falso</label>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: EMPAREJAMIENTO -->
+        <h2>III. Emparejamiento</h2>
+        <p><em>Relaciona cada magnitud eléctrica de la izquierda con su respectiva unidad de medida de la lista desplegable.</em></p>
+        
+        <div class="matching-grid">
+            <div class="question-text">8. Tensión o Voltaje:</div>
+            <div>
+                <select name="q8">
+                    <option value="" disabled selected>-- Selecciona la unidad --</option>
+                    <option value="A">Vatios (W)</option>
+                    <option value="B">Voltios (V)</option>
+                    <option value="C">Amperios (A)</option>
+                </select>
+            </div>
+
+            <div class="question-text">9. Intensidad de Corriente:</div>
+            <div>
+                <select name="q9">
+                    <option value="" disabled selected>-- Selecciona la unidad --</option>
+                    <option value="A">Vatios (W)</option>
+                    <option value="B">Voltios (V)</option>
+                    <option value="C">Amperios (A)</option>
+                </select>
+            </div>
+
+            <div class="question-text">10. Potencia Eléctrica:</div>
+            <div>
+                <select name="q10">
+                    <option value="" disabled selected>-- Selecciona la unidad --</option>
+                    <option value="A">Vatios (W)</option>
+                    <option value="B">Voltios (V)</option>
+                    <option value="C">Amperios (A)</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit">Finalizar Evaluación</button>
+    </form>
+
+    <div class="footer">
+        <p>Evaluación diseñada para estudiantes de Grado 8vo - Área de Electricidad Industrial</p>
+    </div>
+</div>
+
+</body>
+</html>
