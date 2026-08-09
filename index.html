@@ -99,6 +99,8 @@
             button { display: none; }
         }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -106,14 +108,22 @@
     <h1>Evaluación de Electricidad Industrial</h1>
     
     <div class="header-info">
-        <div><strong>Grado:</strong> Octavo (8vo)</div>
-        <div><strong>Nombre:</strong> ___________________________</div>
-        <div><strong>Fecha:</strong> ______________</div>
+        <div>
+            <strong>Grado:</strong><br>
+            <input type="text" id="grado" name="grado" value="Octavo (8vo)" required
+                   style="padding:8px;border:1px solid #ccc;border-radius:5px;font-family:inherit;width:100%;box-sizing:border-box;">
+        </div>
+        <div>
+            <strong>Nombre:</strong><br>
+            <input type="text" id="nombre" name="nombre" placeholder="Nombre completo" required
+                   style="padding:8px;border:1px solid #ccc;border-radius:5px;font-family:inherit;width:100%;box-sizing:border-box;">
+        </div>
+        <div><strong>Fecha:</strong><br><span id="fechaActual"></span></div>
     </div>
 
     <p><em>Instrucciones: Lee atentamente cada pregunta y selecciona la respuesta correcta. Esta evaluación consta de 10 preguntas divididas en tres secciones.</em></p>
 
-    <form onsubmit="event.preventDefault(); alert('Evaluación completada. ¡Buen trabajo!');">
+    <form id="evaluacionForm">
         
         <!-- SECCIÓN 1: SELECCIÓN MÚLTIPLE -->
         <h2>I. Selección Múltiple</h2>
@@ -217,13 +227,156 @@
             </div>
         </div>
 
-        <button type="submit">Finalizar Evaluación</button>
+        <button type="submit" id="submitBtn">Finalizar Evaluación</button>
     </form>
 
     <div class="footer">
         <p>Evaluación diseñada para estudiantes de Grado 8vo - Área de Electricidad Industrial</p>
     </div>
 </div>
+
+
+<script>
+    // ==============================
+    // CONFIGURACIÓN DE SUPABASE
+    // ==============================
+    const SUPABASE_URL = 'https://rvoehhyvbwixudxqadug.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_G2HlATMkfyHSeVE8PZCerw_VNpRicFs';
+
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+    // Fecha visible para el estudiante.
+    document.getElementById('fechaActual').textContent =
+        new Date().toLocaleDateString('es-CO');
+
+    const form = document.getElementById('evaluacionForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Respuestas correctas según las preguntas del HTML proporcionado.
+    const respuestasCorrectas = {
+        q1: 'b',
+        q2: 'c',
+        q3: 'b',
+        q4: 'b',
+        q5: 'f',
+        q6: 'v',
+        q7: 'f',
+        q8: 'B',
+        q9: 'C',
+        q10: 'A'
+    };
+
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        // Validar todas las preguntas.
+        for (let i = 1; i <= 10; i++) {
+            const campo = form.elements['q' + i];
+
+            if (!campo) {
+                alert('No se encontró la pregunta ' + i + '.');
+                return;
+            }
+
+            let respondida = false;
+
+            if (campo instanceof RadioNodeList) {
+                respondida = Array.from(campo).some(input => input.checked);
+            } else {
+                respondida = campo.value !== '';
+            }
+
+            if (!respondida) {
+                alert('Por favor responde la pregunta ' + i + ' antes de enviar la evaluación.');
+                return;
+            }
+        }
+
+        const nombre = document.getElementById('nombre').value.trim();
+        const grado = document.getElementById('grado').value.trim();
+
+        if (!nombre || !grado) {
+            alert('Por favor completa tu nombre y grado.');
+            return;
+        }
+
+        // Evitar doble envío mientras se procesa la solicitud.
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Enviando evaluación...';
+
+        try {
+            const respuestas = {};
+
+            for (let i = 1; i <= 10; i++) {
+                const campo = form.elements['q' + i];
+
+                if (campo instanceof RadioNodeList) {
+                    const seleccionada = Array.from(campo).find(input => input.checked);
+                    respuestas['q' + i] = seleccionada ? seleccionada.value : null;
+                } else {
+                    respuestas['q' + i] = campo.value;
+                }
+            }
+
+            // Calcular puntaje: 1 punto por respuesta correcta.
+            let puntaje = 0;
+
+            for (let i = 1; i <= 10; i++) {
+                if (respuestas['q' + i] === respuestasCorrectas['q' + i]) {
+                    puntaje++;
+                }
+            }
+
+            // Guardar la respuesta en Supabase.
+            const { error } = await supabaseClient
+                .from('respuestas')
+                .insert([{
+                    nombre: nombre,
+                    grado: grado,
+                    p1: respuestas.q1,
+                    p2: respuestas.q2,
+                    p3: respuestas.q3,
+                    p4: respuestas.q4,
+                    p5: respuestas.q5,
+                    p6: respuestas.q6,
+                    p7: respuestas.q7,
+                    p8: respuestas.q8,
+                    p9: respuestas.q9,
+                    p10: respuestas.q10,
+                    puntaje: puntaje
+                }]);
+
+            if (error) {
+                console.error('Error de Supabase:', error);
+                throw new Error('No fue posible guardar la evaluación.');
+            }
+
+            alert(
+                'Evaluación enviada correctamente.\n\n' +
+                'Puntaje obtenido: ' + puntaje + ' de 10.\n\n' +
+                'Tus respuestas fueron registradas.'
+            );
+
+            // Bloquear el formulario después de un envío exitoso.
+            submitBtn.textContent = 'Evaluación enviada';
+            form.querySelectorAll('input, select').forEach(element => {
+                element.disabled = true;
+            });
+
+        } catch (error) {
+            console.error(error);
+
+            alert(
+                'No fue posible enviar la evaluación.\n\n' +
+                'Verifica tu conexión a Internet e inténtalo nuevamente.'
+            );
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Finalizar Evaluación';
+        }
+    });
+</script>
 
 </body>
 </html>
