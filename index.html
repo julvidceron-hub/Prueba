@@ -348,6 +348,9 @@ probarPreguntas();
             const diagnosticoConceptos = [];
             const desempenoConceptos = {};
 
+            const fortalezas = [];
+            const conceptosPorReforzar = [];
+
             // Calcular puntaje: 1 punto por respuesta correcta.
             // Calcular puntaje y resultado de cada pregunta.
             let puntaje = 0;
@@ -418,6 +421,53 @@ probarPreguntas();
                     datos.nivel = 'Requiere refuerzo';
                 }
             });
+
+            const recomendacionesConceptos = {
+                'Corriente eléctrica':
+                    'Repasar el concepto de corriente eléctrica y resolver ejercicios relacionados con el flujo de electrones en materiales conductores.',
+                    
+                'Magnitudes eléctricas':
+                    'Repasar las principales magnitudes eléctricas y sus unidades: voltaje, corriente, resistencia y potencia, mediante ejercicios de aplicación.',
+                
+                'Instrumentos de medición':
+                    'Reforzar la identificación y función de los instrumentos utilizados para medir magnitudes eléctricas, especialmente voltímetro y amperímetro.',
+                
+                'Circuitos eléctricos':
+                    'Repasar las características de los circuitos en serie y paralelo y analizar diferentes esquemas de circuitos.',
+                    
+                'Conductores y aislantes':
+                    'Revisar las diferencias entre materiales conductores y aislantes y relacionarlas con situaciones de uso cotidiano.',
+
+                'Ley de Ohm':
+                    'Practicar la relación entre voltaje, corriente y resistencia mediante ejercicios aplicando la Ley de Ohm.'
+            };
+
+            Object.keys(desempenoConceptos).forEach(concepto => {
+                const datos = desempenoConceptos[concepto];
+
+                datos.recomendacion =
+                    recomendacionesConceptos[concepto] ||
+                    'Revisar nuevamente los contenidos asociados a este concepto y realizar ejercicios de aplicación.';
+            });
+
+            Object.keys(desempenoConceptos).forEach(concepto => {
+                const datos = desempenoConceptos[concepto];
+
+                if (datos.porcentaje >= 80) {
+                    fortalezas.push(concepto);
+                } else {
+                    conceptosPorReforzar.push(concepto);
+                }
+            });
+            
+            console.log(
+                'Desempeño con recomendaciones:',
+                desempenoConceptos
+            );
+
+            console.log('Fortalezas:', fortalezas);
+            
+            console.log('Conceptos por reforzar:', conceptosPorReforzar);
             
             console.log(
                 'Nivel de desempeño por concepto:',
@@ -439,6 +489,28 @@ probarPreguntas();
                     '\n';
             });
 
+            let textoFortalezas = '';
+            
+            if (fortalezas.length > 0) {
+                textoFortalezas = fortalezas
+                .map(concepto => '✓ ' + concepto)
+                .join('\n');
+            } else {
+                textoFortalezas = 'No se identificaron conceptos fortalecidos.';
+            }
+
+            let textoPorReforzar = '';
+            
+            if (conceptosPorReforzar.length > 0) {
+                textoPorReforzar = conceptosPorReforzar
+                .map(concepto => '⚠ ' + concepto)
+                .join('\n');
+            } else {
+                textoPorReforzar = 'No se identificaron conceptos que requieran refuerzo.';
+            }
+
+            console.log('Texto de fortalezas:', textoFortalezas);
+            console.log('Texto por reforzar:', textoPorReforzar);
             console.log('Retroalimentación:', retroalimentacion);
             console.log('Porcentaje de desempeño por concepto:', desempenoConceptos);
             console.log('Diagnóstico por conceptos:', diagnosticoConceptos);
@@ -473,11 +545,19 @@ probarPreguntas();
             }
 
             alert(
-                'Evaluación enviada correctamente.\n\n' +
+                'EVALUACIÓN COMPLETADA\n\n' +
                 'Puntaje obtenido: ' + puntaje + ' de 10.\n\n' +
-                'Desempeño por concepto:\n\n' +
-                retroalimentacion +
-                '\nTus respuestas fueron registradas.'
+                
+                'DESEMPEÑO POR CONCEPTO\n\n' +
+                retroalimentacion + '\n\n' +
+                
+                'FORTALEZAS\n\n' +
+                textoFortalezas + '\n\n' +
+                
+                'CONCEPTOS POR REFORZAR\n\n' +
+                textoPorReforzar + '\n\n' +
+                
+                'Tus respuestas fueron registradas correctamente.'
             );
 
             // Bloquear el formulario después de un envío exitoso.
