@@ -246,6 +246,36 @@
     const { createClient } = supabase;
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
+    let preguntasSupabase = [];
+    let respuestasCorrectasSupabase = {};
+
+    async function probarPreguntas() {
+    const { data, error } = await supabaseClient
+        .from('preguntas')
+        .select('*')
+        .order('numero');
+
+    if (error) {
+        console.error('Error al consultar preguntas:', error);
+        return;
+    }
+
+    preguntasSupabase = data;
+
+    respuestasCorrectasSupabase = {};
+    
+    data.forEach(pregunta => {
+        
+        respuestasCorrectasSupabase['q' + pregunta.numero] = pregunta.respuesta_correcta;
+    
+    });
+    
+    console.log('Preguntas obtenidas desde Supabase:', preguntasSupabase);
+    console.log('Respuestas correctas desde Supabase:', respuestasCorrectasSupabase);
+}
+
+probarPreguntas();
+
     // Fecha visible para el estudiante.
     document.getElementById('fechaActual').textContent =
         new Date().toLocaleDateString('es-CO');
@@ -323,7 +353,7 @@
             let puntaje = 0;
 
             for (let i = 1; i <= 10; i++) {
-                if (respuestas['q' + i] === respuestasCorrectas['q' + i]) {
+                if (respuestas['q' + i] === respuestasCorrectasSupabase['q' + i]) {
                     puntaje++;
                 }
             }
@@ -380,3 +410,4 @@
 
 </body>
 </html>
+
