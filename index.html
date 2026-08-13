@@ -271,7 +271,16 @@
     });
     
     console.log('Preguntas obtenidas desde Supabase:', preguntasSupabase);
+    
     console.log('Respuestas correctas desde Supabase:', respuestasCorrectasSupabase);
+    
+    console.log(
+        'Conceptos desde Supabase:',
+        preguntasSupabase.map(pregunta => ({
+            pregunta: pregunta.numero,
+            concepto: pregunta.concepto
+        }))
+    );
 }
 
 probarPreguntas();
@@ -283,21 +292,7 @@ probarPreguntas();
     const form = document.getElementById('evaluacionForm');
     const submitBtn = document.getElementById('submitBtn');
 
-    // Respuestas correctas según las preguntas del HTML proporcionado.
-    //const respuestasCorrectas = {
-    //    q1: 'b',
-    //    q2: 'c',
-    //    q3: 'b',
-    //    q4: 'b',
-    //    q5: 'f',
-    //    q6: 'v',
-    //    q7: 'f',
-    //    q8: 'B',
-    //    q9: 'C',
-    //    q10: 'A'
-    //};
-
-    form.addEventListener('submit', async function(event) {
+        form.addEventListener('submit', async function(event) {
         event.preventDefault();
 
         // Validar todas las preguntas.
@@ -350,6 +345,8 @@ probarPreguntas();
             }
 
             const resultadoPreguntas = {};
+            const diagnosticoConceptos = [];
+            const desempenoConceptos = {};
 
             // Calcular puntaje: 1 punto por respuesta correcta.
             // Calcular puntaje y resultado de cada pregunta.
@@ -366,7 +363,85 @@ probarPreguntas();
                     puntaje++;
                 }
             }
+
+            for (let i = 1; i <= 10; i++) {
+                const preguntaSupabase = preguntasSupabase.find(
+                    pregunta => pregunta.numero === i
+                );
+                
+                if (preguntaSupabase) {
+                    diagnosticoConceptos.push({
+                        pregunta: i,
+                        concepto: preguntaSupabase.concepto,
+                        correcta: resultadoPreguntas['q' + i]
+                    });
+                }
+            }
+
+            // Agrupar resultados por concepto.
+            diagnosticoConceptos.forEach(item => {
+                if (!desempenoConceptos[item.concepto]) {
+                    desempenoConceptos[item.concepto] = {
+                        correctas: 0,
+                        total: 0
+                    };
+                }
             
+                desempenoConceptos[item.concepto].total++;
+            
+                if (item.correcta) {
+                desempenoConceptos[item.concepto].correctas++;
+                }
+            });
+
+            console.log('Desempeño por concepto:', desempenoConceptos);
+            
+            // Calcular porcentaje de desempeño por concepto.
+            Object.keys(desempenoConceptos).forEach(concepto => {
+                const datos = desempenoConceptos[concepto];
+                
+                datos.porcentaje = Math.round(
+                    
+                    (datos.correctas / datos.total) * 100
+                );
+            });
+
+            // Clasificar el nivel de desempeño.
+            Object.keys(desempenoConceptos).forEach(concepto => {
+                const datos = desempenoConceptos[concepto];
+                
+                if (datos.porcentaje >= 80) {
+                    datos.nivel = 'Fortalecido';
+                } else if (datos.porcentaje >= 60) {
+                    datos.nivel = 'En desarrollo';
+                } else {
+                    datos.nivel = 'Requiere refuerzo';
+                }
+            });
+            
+            console.log(
+                'Nivel de desempeño por concepto:',
+                desempenoConceptos
+            );
+
+            // Construir retroalimentación por concepto.
+            let retroalimentacion = '';
+            
+            Object.keys(desempenoConceptos).forEach(concepto => {
+                const datos = desempenoConceptos[concepto];
+
+                retroalimentacion +=
+                    concepto +
+                    ': ' +
+                    datos.porcentaje +
+                    '% - ' +
+                    datos.nivel +
+                    '\n';
+            });
+
+            console.log('Retroalimentación:', retroalimentacion);
+            console.log('Porcentaje de desempeño por concepto:', desempenoConceptos);
+            console.log('Diagnóstico por conceptos:', diagnosticoConceptos);
             console.log('Resultado por pregunta:', resultadoPreguntas);
             console.log('Puntaje total:', puntaje);
 
@@ -387,7 +462,9 @@ probarPreguntas();
                     p9: respuestas.q9,
                     p10: respuestas.q10,
                     puntaje: puntaje,
-                    resultado_preguntas: resultadoPreguntas
+                    resultado_preguntas: resultadoPreguntas,
+                    diagnostico_conceptos: diagnosticoConceptos,
+                    desempeno_conceptos: desempenoConceptos
                 }]);
 
             if (error) {
@@ -396,9 +473,11 @@ probarPreguntas();
             }
 
             alert(
-                'Evaluación enviada correctamente.\n\n' +
+                Evaluación enviada correctamente.\n\n' +
                 'Puntaje obtenido: ' + puntaje + ' de 10.\n\n' +
-                'Tus respuestas fueron registradas.'
+                'Desempeño por concepto:\n\n' +
+                retroalimentacion +
+                '\nTus respuestas fueron registradas.'
             );
 
             // Bloquear el formulario después de un envío exitoso.
