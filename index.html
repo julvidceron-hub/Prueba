@@ -285,16 +285,16 @@ probarPreguntas();
 
     // Respuestas correctas según las preguntas del HTML proporcionado.
     //const respuestasCorrectas = {
-      //  q1: 'b',
-      //  q2: 'c',
-      //  q3: 'b',
-      //  q4: 'b',
-      //  q5: 'f',
-      //  q6: 'v',
-      //  q7: 'f',
-      //  q8: 'B',
-      //  q9: 'C',
-      //  q10: 'A'
+    //    q1: 'b',
+    //    q2: 'c',
+    //    q3: 'b',
+    //    q4: 'b',
+    //    q5: 'f',
+    //    q6: 'v',
+    //    q7: 'f',
+    //    q8: 'B',
+    //    q9: 'C',
+    //    q10: 'A'
     //};
 
     form.addEventListener('submit', async function(event) {
@@ -349,14 +349,26 @@ probarPreguntas();
                 }
             }
 
-            // Calcular puntaje: 1 punto por respuesta correcta.
-            let puntaje = 0;
+            const resultadoPreguntas = {};
 
+            // Calcular puntaje: 1 punto por respuesta correcta.
+            // Calcular puntaje y resultado de cada pregunta.
+            let puntaje = 0;
+            
             for (let i = 1; i <= 10; i++) {
-                if (respuestas['q' + i] === respuestasCorrectasSupabase['q' + i]) {
+                const pregunta = 'q' + i;
+                
+                const esCorrecta =
+                    respuestas[pregunta] === respuestasCorrectasSupabase[pregunta];
+                
+                resultadoPreguntas[pregunta] = esCorrecta;
+                if (esCorrecta) {
                     puntaje++;
                 }
             }
+            
+            console.log('Resultado por pregunta:', resultadoPreguntas);
+            console.log('Puntaje total:', puntaje);
 
             // Guardar la respuesta en Supabase.
             const { error } = await supabaseClient
@@ -375,6 +387,7 @@ probarPreguntas();
                     p9: respuestas.q9,
                     p10: respuestas.q10,
                     puntaje: puntaje
+                    resultado_preguntas: resultadoPreguntas
                 }]);
 
             if (error) {
@@ -410,4 +423,3 @@ probarPreguntas();
 
 </body>
 </html>
-
