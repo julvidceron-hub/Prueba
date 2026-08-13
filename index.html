@@ -98,6 +98,135 @@
             .container { box-shadow: none; padding: 0; }
             button { display: none; }
         }
+
+        .resultado-final {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            background: #ffffff;
+        }
+
+        .resultado-final h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .resultado-final h3 {
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .puntaje-final {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+        }
+
+        .concepto-resultado {
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .concepto-nombre {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .concepto-datos {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .porcentaje {
+            font-weight: bold;
+        }
+
+        .nivel {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .nivel-fortalecido {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .nivel-en-desarrollo {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .nivel-requiere-refuerzo {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .fortalezas,
+        .refuerzo,
+        .recomendaciones {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .registro-confirmado {
+            margin-top: 25px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .barra-desempeno {
+            width: 100%;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .barra-desempeno-progreso {
+            height: 100%;
+            background: #2563eb;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .nivel-global {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .titulo-puntaje {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .numero-puntaje {
+            font-size: 48px;
+            font-weight: bold;
+            line-height: 1;
+            margin: 10px 0;
+        }
+
+        .numero-puntaje span {
+            font-size: 24px;
+            font-weight: normal;
+        }
+
+        .nivel-global {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -228,6 +357,8 @@
         </div>
 
         <button type="submit" id="submitBtn">Finalizar Evaluación</button>
+        
+        <div id="resultadoEvaluacion" style="display:none;"></div>
     </form>
 
     <div class="footer">
@@ -366,6 +497,20 @@ probarPreguntas();
                     puntaje++;
                 }
             }
+
+            let nivelGlobal = '';
+
+            if (puntaje >= 9) {
+                nivelGlobal = 'Desempeño destacado';
+            } else if (puntaje >= 8) {
+                nivelGlobal = 'Desempeño satisfactorio';
+            } else if (puntaje >= 6) {
+                nivelGlobal = 'Desempeño en desarrollo';
+            } else {
+                nivelGlobal = 'Requiere refuerzo';
+            }
+
+            console.log('Nivel global:', nivelGlobal);
 
             for (let i = 1; i <= 10; i++) {
                 const preguntaSupabase = preguntasSupabase.find(
@@ -509,6 +654,33 @@ probarPreguntas();
                 textoPorReforzar = 'No se identificaron conceptos que requieran refuerzo.';
             }
 
+            let recomendacionesRefuerzo = '';
+
+            if (conceptosPorReforzar.length > 0) {
+                recomendacionesRefuerzo = conceptosPorReforzar
+                    .map(concepto => {
+                        const datos = desempenoConceptos[concepto];
+
+                        return (
+                            '• ' +
+                            concepto +
+                            ' (' +
+                            datos.porcentaje +
+                            '%): ' +
+                            datos.recomendacion
+                        );
+                    })
+                    .join('\n\n');
+            } else {
+                recomendacionesRefuerzo =
+                    'No se requieren recomendaciones de refuerzo en esta evaluación.';
+            }
+
+            console.log(
+                'Recomendaciones de refuerzo:',
+                recomendacionesRefuerzo
+            );
+
             console.log('Texto de fortalezas:', textoFortalezas);
             console.log('Texto por reforzar:', textoPorReforzar);
             console.log('Retroalimentación:', retroalimentacion);
@@ -544,19 +716,22 @@ probarPreguntas();
                 throw new Error('No fue posible guardar la evaluación.');
             }
 
-            alert(
+            /*alert(
                 'EVALUACIÓN COMPLETADA\n\n' +
                 'Puntaje obtenido: ' + puntaje + ' de 10.\n\n' +
-                
+
                 'DESEMPEÑO POR CONCEPTO\n\n' +
                 retroalimentacion + '\n\n' +
-                
+
                 'FORTALEZAS\n\n' +
                 textoFortalezas + '\n\n' +
-                
+
                 'CONCEPTOS POR REFORZAR\n\n' +
                 textoPorReforzar + '\n\n' +
-                
+
+                'RECOMENDACIONES\n\n' +
+                recomendacionesRefuerzo + '\n\n' +
+
                 'Tus respuestas fueron registradas correctamente.'
             );
 
@@ -565,6 +740,100 @@ probarPreguntas();
             form.querySelectorAll('input, select').forEach(element => {
                 element.disabled = true;
             });
+            */
+
+            const resultadoEvaluacion = document.getElementById('resultadoEvaluacion');
+
+            resultadoEvaluacion.innerHTML = `
+                <div class="resultado-final">
+
+                    <h2>Evaluación completada</h2>
+
+                    <div class="puntaje-final">
+                        <div class="titulo-puntaje">
+                            Resultado de la evaluación
+                        </div>
+
+                        <div class="numero-puntaje">
+                            ${puntaje}<span>/10</span>
+                        </div>
+
+                        <div class="nivel-global">
+                            ${nivelGlobal}
+                        </div>
+                    </div>
+
+                    <h3>Desempeño por concepto</h3>
+
+                    <div class="desempeno-conceptos">
+                        ${Object.keys(desempenoConceptos).map(concepto => {
+                            const datos = desempenoConceptos[concepto];
+
+                            return `
+                                <div class="concepto-resultado">
+                                    <div class="concepto-nombre">
+                                        ${concepto}
+                                    </div>
+
+                                    <div class="concepto-datos">
+                                        <span class="porcentaje">
+                                            ${datos.porcentaje}%
+                                        </span>
+
+                                        <span class="nivel nivel-${datos.nivel
+                                            .toLowerCase()
+                                            .replace(' ', '-') }">
+                                            ${datos.nivel}
+                                        </span>
+                                    </div>
+
+                                    <div class="barra-desempeno">
+                                        <div
+                                            class="barra-desempeno-progreso"
+                                            style="width: ${datos.porcentaje}%;">
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <h3>Fortalezas</h3>
+
+                    <div class="fortalezas">
+                        ${fortalezas.length > 0
+                            ? fortalezas.map(concepto => `<p>✓ ${concepto}</p>`).join('')
+                            : '<p>No se identificaron conceptos fortalecidos.</p>'
+                        }
+                    </div>
+
+                    <h3>Conceptos por reforzar</h3>
+
+                    <div class="refuerzo">
+                        ${conceptosPorReforzar.length > 0
+                            ? conceptosPorReforzar.map(concepto => `<p>⚠ ${concepto}</p>`).join('')
+                            : '<p>No se identificaron conceptos que requieran refuerzo.</p>'
+                        }
+                    </div>
+
+                    <h3>Recomendaciones</h3>
+
+                    <div class="recomendaciones">
+                        ${recomendacionesRefuerzo
+                            .split('\n\n')
+                            .map(recomendacion => `<p>${recomendacion}</p>`)
+                            .join('')
+                        }
+                    </div>
+
+                    <p class="registro-confirmado">
+                        Tus respuestas fueron registradas correctamente.
+                    </p>
+
+                </div>
+            `;
+
+            resultadoEvaluacion.style.display = 'block';
 
         } catch (error) {
             console.error(error);
